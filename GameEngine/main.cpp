@@ -118,7 +118,7 @@ int main(int argc, char** argv)
             {
                 if (ships[i]->Collision(bullets[j]->GetBulletRect()))
                 {
-                    
+                    //Testing
                     if (*find(bullets.begin(), bullets.end(), bullets[j])) {
                         //Element found in array
                         bullets[j]->Destroy();
