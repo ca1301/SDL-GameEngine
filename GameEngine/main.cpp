@@ -7,6 +7,7 @@
 #include <vector>
 #include <SDL_mixer.h>
 #include "Sound.h"
+#include <algorithm>
 using namespace std;
 
 int main(int argc, char** argv)
@@ -14,7 +15,12 @@ int main(int argc, char** argv)
     //Initialise objects
     LoadSDL* loadSDL = new LoadSDL();
     Start* start1 = new Start();
-
+    int enemiesPerRound[3][2]  = {
+        {5,2},
+        {10,3},
+        {15,4}
+    };
+   cout << enemiesPerRound[0, 0] << endl;
     //Scene management
     vector <Bullet*> bullets;
     vector <Ship*> ships;
@@ -26,7 +32,7 @@ int main(int argc, char** argv)
     //Player
      Player* playerOne = new Player(5);
      TextScreen* scoreText = new TextScreen();
-    playerOne->Draw(1, "../assets/player/Ship.png", 2, 2);
+   
     int playerScore = 0;
     scoreText->Draw(20, "../assets/Roboto.ttf", 40, 20);
 
@@ -37,7 +43,7 @@ int main(int argc, char** argv)
     start1->Draw("../assets/menu.png", 0, 0, 1, 1);
     Sound* sound = new Sound("../assets/button_hover.wav");
 
-    
+    playerOne->Draw(1, "../assets/player/Ship.png", 2, 2);
     for (size_t i = 0; i < rows; i++)
     {
         for (size_t j = 0; j < columns; j++)
@@ -112,11 +118,20 @@ int main(int argc, char** argv)
             {
                 if (ships[i]->Collision(bullets[j]->GetBulletRect()))
                 {
-                    bullets[j]->Destroy();
-                    bullets.erase(bullets.begin() + j);
+                    
+                    if (*find(bullets.begin(), bullets.end(), bullets[j])) {
+                        //Element found in array
+                        bullets[j]->Destroy();
+                        bullets.erase(bullets.begin() + j);
+                    }
+                    
+                    if (*find(ships.begin(), ships.end(), ships[i])) {
+                        //Element found in array
+                        ships[i]->Destroy();
+                        ships.erase(ships.begin() + i);
+                    }
 
-                    ships[i]->Destroy();
-                    ships.erase(ships.begin() + i);
+
                     playerScore += 30;
                 }
             }
@@ -135,3 +150,14 @@ int main(int argc, char** argv)
     loadSDL->Clean();
     return 0;
 }
+
+struct compare
+{
+    int key;
+    compare(int const& i) : key(i) {}
+
+    bool operator()(int const& i) {
+        return (i == key);
+    }
+};
+
