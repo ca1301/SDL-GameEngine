@@ -11,7 +11,24 @@
 
 using namespace std;
 
+bool CheckRoundOver(vector<Ship*> ships)
+{
+    int aliveEnemies = 0;
+    for (size_t i = 0; i < ships.size(); i++)
+    {
+        if (!ships[i]->destroyed)
+        {
+            aliveEnemies++;
+        }
+    }
 
+    if (aliveEnemies == 0)
+    {
+        cout << "Round Over" << endl;
+        return true;
+    }
+    return false;
+}
 
 void Collide(Ship* ship, Bullet* bullet, Player* player)
 {
@@ -28,6 +45,8 @@ void Collide(Ship* ship, Bullet* bullet, Player* player)
     }
     return;
 }
+
+
 
 
 int main(int argc, char** argv)
@@ -124,12 +143,17 @@ int main(int argc, char** argv)
         for (int i = 0; i < ships.size(); i++) {
             ships[i]->Update();
             ships[i]->Render(0, SDL_RendererFlip::SDL_FLIP_NONE);
+
+            //Handle enemy movement
             if (ships[0]->GetShipRect().x < 500)
             {
                 float x = ships[i]->GetShipRect().x;
                 ships[i]->Move(x += 1, ships[i]->GetShipRect().y);
             }
+
         }
+        
+       
 
         for (int i = 0; i < ships.size(); i++)
         {
@@ -138,6 +162,13 @@ int main(int argc, char** argv)
                 if (ships[i]->destroyed == false && bullets[j]->destroyed == false)
                 {
                     Collide(ships[i], bullets[j], playerOne);
+                    if (CheckRoundOver(ships))
+                    {
+                        for (size_t g = 0; g < ships.size(); g++)
+                        {
+                            ships.erase(ships.begin() + g);
+                        }
+                    }
                 }
             }
         }
