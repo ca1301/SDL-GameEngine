@@ -3,14 +3,6 @@
 
 using namespace std;
 
-TextScreen::TextScreen()
-{
-
-}
-
-TextScreen::~TextScreen()
-{
-}
 
 void TextScreen::Draw(int fontSize, string fontPath, int posX, int posY)
 {
@@ -26,7 +18,7 @@ void TextScreen::Draw(int fontSize, string fontPath, int posX, int posY)
 
 void TextScreen::Render()
 {
-	SDL_SetRenderDrawColor(m_Renderer, 255, 255, 255, 255);
+	
 	SDL_RenderCopy(m_Renderer, textTexture, nullptr, &mTextRect);
 }
 

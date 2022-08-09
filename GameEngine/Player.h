@@ -16,6 +16,7 @@ public:
 	SDL_Rect GetPosPlayer();
 	bool playerShoot = false;
 	int GetLives() { return lives; }
+	int score = 0;
 private:
 	int movementSpeed;
 	int angle = 0;

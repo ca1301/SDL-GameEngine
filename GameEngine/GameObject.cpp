@@ -9,15 +9,15 @@ void GameObject::Draw(int m_frame, const char* path, float posX, float posY, flo
 	m_frames = m_frame;
 	position.x = posX;
 	position.y = posY;
-	if (m_Surface != nullptr)
+	if (m_Surface == nullptr)
 	{
-		std::cout << "Load Surface - success" << std::endl;
+		std::cout << "Load Surface - failed" << std::endl;
 	}
 
 	m_Texture = SDL_CreateTextureFromSurface(m_Renderer, m_Surface);
-	if (m_Texture != nullptr)
+	if (m_Texture == nullptr)
 	{
-		std::cout << "Load Texture - success" << std::endl;
+		std::cout << "Load Texture - failed" << std::endl;
 	}
 
 
@@ -47,7 +47,7 @@ void GameObject::Render(int angle, SDL_RendererFlip flipped)
 	SDL_RenderCopyEx(m_Renderer, m_Texture, &m_sourceRectangle, &m_destRectangle, angle, NULL, flipped);
 }
 
-void GameObject::Update(int m_Speed)
+void GameObject::Update()
 {
 	m_destRectangle.x = position.x;
 	m_destRectangle.y = position.y;

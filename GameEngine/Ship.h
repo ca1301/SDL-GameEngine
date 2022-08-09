@@ -3,7 +3,10 @@
 class Ship : public GameObject
 {
 public:
-	bool Collision(SDL_Rect bullet);
+	Ship();
+	SDL_Rect GetShipRect() { return m_destRectangle; }
 	void Destroy();
+	bool destroyed;
+	void Move(float x, float y);
 };
 

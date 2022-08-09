@@ -1,5 +1,9 @@
 #include "Bullet.h"
 #include <SDL_image.h>
+Bullet::Bullet()
+{
+	destroyed = false;
+}
 void Bullet::Draw(int m_frame, const char* path, float posX, float posY, float scaleX, float scaleY)
 {
 	m_Surface = IMG_Load(path);
@@ -7,15 +11,15 @@ void Bullet::Draw(int m_frame, const char* path, float posX, float posY, float s
 	m_frames = m_frame;
 	position.x = posX;
 	position.y = posY;
-	if (m_Surface != nullptr)
+	if (m_Surface == nullptr)
 	{
-		std::cout << "Load Surface - success" << std::endl;
+		std::cout << "Load Surface - failed" << std::endl;
 	}
 
 	m_Texture = SDL_CreateTextureFromSurface(m_Renderer, m_Surface);
-	if (m_Texture != nullptr)
+	if (m_Texture == nullptr)
 	{
-		std::cout << "Load Texture - success" << std::endl;
+		std::cout << "Load Texture - failed" << std::endl;
 	}
 
 

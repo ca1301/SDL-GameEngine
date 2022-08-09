@@ -9,8 +9,6 @@ class TextScreen : LoadSDL
 {
 
 public:
-	TextScreen();
-	~TextScreen();
 	void Draw(int fontSize, string fontPath, int posX, int posY);
 	void Render();
 	void Update(string str);
