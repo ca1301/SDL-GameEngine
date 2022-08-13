@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 
         //Loop through the ships and update them
         for (int i = 0; i < ships.size(); i++) {
-            ships[i]->Update();
+            ships[i]->Update(deltaTime);
             ships[i]->Render(0, SDL_RendererFlip::SDL_FLIP_NONE);
 
             //Handle enemy movement

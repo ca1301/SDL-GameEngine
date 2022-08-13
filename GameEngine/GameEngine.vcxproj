@@ -145,7 +145,6 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="LoadSDL.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -158,10 +157,8 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="LoadSDL.h" />
-    <ClInclude Include="Menu.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Rectangle.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Ship.h" />
     <ClInclude Include="Sound.h" />
     <ClInclude Include="Start.h" />

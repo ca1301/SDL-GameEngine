@@ -45,7 +45,7 @@ void GameObject::Render(int angle, SDL_RendererFlip flipped)
 	SDL_RenderCopyEx(m_Renderer, m_Texture, &m_sourceRectangle, &m_destRectangle, angle, NULL, flipped);
 }
 
-void GameObject::Update()
+void GameObject::Update(float dt)
 {
 	m_destRectangle.x = position.x;
 	m_destRectangle.y = position.y;
