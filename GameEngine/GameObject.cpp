@@ -37,8 +37,6 @@ void GameObject::Draw(int m_frame, const char* path, float posX, float posY, flo
 	m_destRectangle.w = m_sourceRectangle.w * scaleX;
 	m_destRectangle.h = m_Surface->h * scaleY;
 
-	//Free memory
-	SDL_FreeSurface(m_Surface);
 }
 
 void GameObject::Render(int angle, SDL_RendererFlip flipped)

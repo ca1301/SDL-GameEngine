@@ -21,7 +21,6 @@ bool CheckRoundOver(vector<Ship*> ships)
             aliveEnemies++;
         }
     }
-
     if (aliveEnemies == 0)
     {
         cout << "Round Over" << endl;
@@ -29,6 +28,7 @@ bool CheckRoundOver(vector<Ship*> ships)
     }
     return false;
 }
+
 
 void Collide(Ship* ship, Bullet* bullet, Player* player)
 {
@@ -53,33 +53,45 @@ int main(int argc, char** argv)
 {
     //Initialise objects
     LoadSDL* loadSDL = new LoadSDL();
-    Start* start1 = new Start();
+    Start* startScreen = new Start();
+    int lastUpdate = 0;
 
     //Scene management
+    int currentRound = 1;
     vector <Bullet*> bullets;
     vector <Ship*> ships;
+    bool playerDied = false;
 
     //Amount of enemies
     int columns = 15;
     int rows = 3;
 
+
     //Player
-     Player* playerOne = new Player(5);
-     TextScreen* scoreText = new TextScreen();\
-     scoreText->Draw(20, "../assets/Roboto.ttf", 40, 20);
+     Player* player = new Player(5);
 
-     //Enemies
-     float movementSpeed = 3;
-     float lastMove = 0;
+     //UI
+     TextScreen* scoreText = new TextScreen();
+     SDL_Color scoreTextColour = {0,0,200,0};
+     scoreText->Draw(20, "../assets/Roboto.ttf", 40, 20, scoreTextColour);
+
+     TextScreen* roundText = new TextScreen();
+     SDL_Color roundTextColour = { 0,200,200,0 };
+     roundText->Draw(20, "../assets/Roboto.ttf", 1150, 20, roundTextColour);
 
 
-    int lastUpdate = 0;
+  
     loadSDL->Load();
    
-    start1->Draw("../assets/menu.png", 0, 0, 1, 1);
+    startScreen->Draw("../assets/menu.png", 0, 0, 1, 1);
+    player->Draw(1, "../assets/player/Ship.png", 2, 2);
+
+    //Sounds initialization
     Sound* sound = new Sound("../assets/button_hover.wav");
 
-    playerOne->Draw(1, "../assets/player/Ship.png", 2, 2);
+
+
+    //Initialize enemies
     for (size_t i = 0; i < rows; i++)
     {
         for (size_t j = 0; j < columns; j++)
@@ -90,35 +102,44 @@ int main(int argc, char** argv)
         }
     }
     
-    while (start1->gameStarted == false)
+    //Show game menu before starting game
+    while (startScreen->gameStarted == false)
     {
-        start1->Render();
-        start1->HandleEvents();
+        startScreen->Render();
+        startScreen->HandleEvents();
     }
 
 
-    bool playerDied = false;
+
 
     //Game Loop
     while (playerDied == false)
     {
         //Clear the screen each frame
         SDL_RenderClear(loadSDL->m_Renderer);
+
         //Get delta time for player/enemy movement
         unsigned int ticks = SDL_GetTicks() - lastUpdate;
         float deltaTime = ticks / 1000.0f;
         lastUpdate = SDL_GetTicks();
 
-
+        //Set the background color to a dark grey colour
         SDL_SetRenderDrawColor(loadSDL->m_Renderer, 70, 70, 70, 255);
 
-      
+        //Rendering and update the score text to display the players current score
+        scoreText->Update("Score:  " + std::to_string(player->score));
+        scoreText->Render();
 
-        if (playerOne->playerShoot == true)
+        //Rendering and update the round text to display the players current round
+        roundText->Update("Round:  " + std::to_string(currentRound));
+        roundText->Render();
+
+        //Triggered from the player script
+        if (player->playerShoot == true)
         {
-            playerOne->playerShoot = false;
+            player->playerShoot = false;
             Bullet* bullet = new Bullet();
-            bullet->Draw(1, "../assets/player/Bullet.png", playerOne->GetPosPlayer().x, playerOne->GetPosPlayer().y - 30, 2, 2);
+            bullet->Draw("../assets/player/Bullet.png", player->GetPosPlayer().x, player->GetPosPlayer().y - 30, 2, 2);
             bullets.push_back(bullet);
 
             if (Mix_PlayChannel(-1, sound->wave(), 0, ) == -1)
@@ -127,6 +148,7 @@ int main(int argc, char** argv)
             }
         }
 
+        //Loop through the bullets and update them
         for (int i = 0; i < bullets.size(); i++) {
 
             bullets[i]->Update(deltaTime);
@@ -140,6 +162,7 @@ int main(int argc, char** argv)
             }
         }
 
+        //Loop through the ships and update them
         for (int i = 0; i < ships.size(); i++) {
             ships[i]->Update();
             ships[i]->Render(0, SDL_RendererFlip::SDL_FLIP_NONE);
@@ -154,38 +177,38 @@ int main(int argc, char** argv)
         }
         
        
-
+        //Handle bullet and ship collision as well as check the end of the round
         for (int i = 0; i < ships.size(); i++)
         {
             for (int j = 0; j < bullets.size(); j++)
             {
                 if (ships[i]->destroyed == false && bullets[j]->destroyed == false)
                 {
-                    Collide(ships[i], bullets[j], playerOne);
+                    Collide(ships[i], bullets[j], player);
                     if (CheckRoundOver(ships))
                     {
+                        currentRound++;
                         for (size_t g = 0; g < ships.size(); g++)
                         {
                             ships.erase(ships.begin() + g);
                         }
+                        //Create new round
                     }
                 }
             }
         }
         
-        playerOne->Update(deltaTime);
-        playerOne->HandleEvents();
-
-        playerOne->Render();
-
-        //Rendering and update the score text to display the players current score
-        scoreText->Render();
-        scoreText->Update("Score:  " + std::to_string(playerOne->score));
+        //Update the player based on keyboard input
+        player->Update(deltaTime);
+        player->HandleEvents();
+        player->Render();
 
         //Draw in window
         SDL_RenderPresent(loadSDL->m_Renderer);
     }
+
     std::cout << "Game Over!" << std::endl;
+    //Free up music and clean up SDL
     Mix_FreeChunk(sound->wave());
     loadSDL->Clean();
     return 0;

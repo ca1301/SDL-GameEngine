@@ -9,7 +9,7 @@ class TextScreen : LoadSDL
 {
 
 public:
-	void Draw(int fontSize, string fontPath, int posX, int posY);
+	void Draw(int fontSize, string fontPath, int posX, int posY, SDL_Color textColour);
 	void Render();
 	void Update(string str);
 	void LoadFont(const char*);

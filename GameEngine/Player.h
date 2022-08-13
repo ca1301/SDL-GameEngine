@@ -27,8 +27,6 @@ private:
 	void PlayerShoot();
 	bool shoot = false;
 	int lives = 3;
-	//Player Border
-	Rectangle* playerRect;
 };
 
 

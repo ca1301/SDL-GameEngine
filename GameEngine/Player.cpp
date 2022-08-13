@@ -8,8 +8,6 @@ Player::Player(int speed)
 {
 	movementSpeed = speed;
 
-	//Player Border
-	playerRect = new Rectangle(255, 255, 255);
 }
 
 void Player::Draw(int m_frame, const char* path, float scaleX, float scaleY)
@@ -31,13 +29,6 @@ void Player::Draw(int m_frame, const char* path, float scaleX, float scaleY)
 	}
 
 
-
-	SDL_SetRenderDrawColor(m_Renderer, 0, 255, 0, 255);
-
-
-
-
-
 	//Set the source rectangle
 	m_sourceRectangle.x = 0;
 	m_sourceRectangle.y = 0;
@@ -50,8 +41,6 @@ void Player::Draw(int m_frame, const char* path, float scaleX, float scaleY)
 	m_destRectangle.w = m_sourceRectangle.w * scaleX;
 	m_destRectangle.h = m_Surface->h * scaleY;
 
-	//Free memory
-	//SDL_FreeSurface(m_Surface);
 }
 
 

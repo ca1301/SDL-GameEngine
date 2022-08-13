@@ -1,12 +1,13 @@
 #pragma once
-#include "LoadSDL.h"
-class Rectangle : LoadSDL
+#include "GameObject.h"
+class Rectangle : GameObject
 {
 public:
-	Rectangle(Uint8 r, Uint8 g, Uint8 b);
+	Rectangle(Uint8 r, Uint8 g, Uint8 b, SDL_Rect rect);
 	~Rectangle();
-	void Drawing(SDL_Rect);
+	void Drawing();
 private:
 	SDL_Color rectColour;
+	SDL_Rect rect;
 };
 
