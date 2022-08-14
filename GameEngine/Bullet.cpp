@@ -1,8 +1,9 @@
 #include "Bullet.h"
 #include <SDL_image.h>
-Bullet::Bullet()
+Bullet::Bullet(int direction)
 {
 	destroyed = false;
+	this->direction = direction;
 }
 void Bullet::Draw(const char* path, float posX, float posY, float scaleX, float scaleY)
 {
@@ -51,7 +52,15 @@ void Bullet::Render()
 
 void Bullet::Update(float dt)
 {
-	position.y -= dt + speed;
+	if (direction == 0)
+	{
+		position.y -= dt + speed;
+	}
+	else
+	{
+		position.y += dt + speed;
+	}
+	
 	m_destRectangle.y = position.y;
 }
 

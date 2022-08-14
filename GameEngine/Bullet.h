@@ -4,7 +4,7 @@ class Bullet : public GameObject
 {
 public:
 	
-	Bullet();
+	Bullet(int direction);
 	//Initial draw call for bullet
 	void Draw(const char* path, float posX, float posY, float scaleX, float scaleY);
 	//Render bullet on screen
@@ -19,7 +19,7 @@ public:
 	bool destroyed;
 
 protected:
-	
+	int direction = 0;
 	SDL_Surface* m_Surface;
 	SDL_Texture* m_Texture;
 	SDL_Rect m_sourceRectangle;
