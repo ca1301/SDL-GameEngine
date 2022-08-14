@@ -78,20 +78,7 @@ void Player::HandleMovement(float dt)
 
 SDL_Rect Player::GetPosPlayer()
 {
-	SDL_Rect m_player = m_destRectangle;
-
-
-	if (angle != 0)
-	{
-		m_player.x += (m_player.w - m_player.h) / 2;
-		m_player.y -= (m_player.w - m_player.h) / 2;
-
-		int temp = m_player.w;
-		m_player.w = m_player.h;
-		m_player.h = temp;
-	}
-
-	return m_player;
+	return m_destRectangle;
 }
 
 

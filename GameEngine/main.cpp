@@ -50,6 +50,22 @@ void Collide(Ship* ship, Bullet* bullet, Player* player)
 	return;
 }
 
+
+bool PlayerCollide(Bullet* bullet, Player* player)
+{
+	if ((bullet->GetBulletRect().x - player->GetPosPlayer().x < player->GetPosPlayer().w) &&
+		(player->GetPosPlayer().x - bullet->GetBulletRect().x < bullet->GetBulletRect().w) &&
+		(bullet->GetBulletRect().y - player->GetPosPlayer().y < player->GetPosPlayer().h) &&
+		(player->GetPosPlayer().y - bullet->GetBulletRect().y < bullet->GetBulletRect().h))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void EnemyShoot(vector <Ship*> ships, float dt)
 {
 	gameTime += dt;
@@ -207,6 +223,11 @@ int main(int argc, char** argv)
 
 			enemyBullets[i]->Update(deltaTime);
 			enemyBullets[i]->Render();
+
+			if (PlayerCollide(enemyBullets[i], player))
+			{
+				playerDied = true;
+			}
 		}
 		//Loop through the ships and update them
 		for (int i = 0; i < ships.size(); i++) {
@@ -256,14 +277,9 @@ int main(int argc, char** argv)
 		}
 
 
-
-
-
-
 		//Handle bullet and ship collision as well as check the end of the round
 		for (int i = 0; i < ships.size(); i++)
 		{
-
 			for (int j = 0; j < bullets.size(); j++)
 			{
 				if (ships[i]->destroyed == false && bullets[j]->destroyed == false)
