@@ -13,7 +13,7 @@ using namespace std;
 
 vector <Bullet*> enemyBullets;
 float gameTime = 0;
-float fireRate = 0.7f;
+float fireRate = 0.2f;
 float lastBullet = 0;
 
 bool CheckRoundOver(vector<Ship*> ships)
@@ -34,7 +34,7 @@ bool CheckRoundOver(vector<Ship*> ships)
 }
 
 
-void Collide(Ship* ship, Bullet* bullet, Player* player)
+void Collide(Ship* ship, Bullet* bullet, Player* player, Sound* destroySound)
 {
 	if ((bullet->GetBulletRect().x - ship->GetShipRect().x < ship->GetShipRect().w) &&
 		(ship->GetShipRect().x - bullet->GetBulletRect().x < bullet->GetBulletRect().w) &&
@@ -46,6 +46,10 @@ void Collide(Ship* ship, Bullet* bullet, Player* player)
 		ship->destroyed = true;
 		ship->Destroy();
 		player->score += 30;
+		if (Mix_PlayChannel(-1, destroySound->wave(), 0, ) == -1)
+		{
+			cout << "Failed to play sound" << endl;
+		}
 	}
 	return;
 }
@@ -69,7 +73,10 @@ bool PlayerCollide(Bullet* bullet, Player* player)
 void EnemyShoot(vector <Ship*> ships, float dt)
 {
 	gameTime += dt;
+	
 	vector <Ship*> aliveShips;
+
+	
 	aliveShips.clear();
 	for (size_t i = 0; i < ships.size(); i++)
 	{
@@ -78,7 +85,6 @@ void EnemyShoot(vector <Ship*> ships, float dt)
 			aliveShips.push_back(ships[i]);
 		}
 	}
-	
 	if (gameTime > fireRate + lastBullet)
 	{
 		lastBullet = gameTime + fireRate;
@@ -106,7 +112,7 @@ int main(int argc, char** argv)
 	int lastUpdate = 0;
 
 	//Scene management
-	int currentRound = 1;
+	int playerLives = 1;
 	vector <Bullet*> bullets;
 	vector <Ship*> ships;
 	bool playerDied = false;
@@ -118,7 +124,7 @@ int main(int argc, char** argv)
 	int rows = 3;
 	bool movingRight = true;
 	bool movingDown = false;
-	int amountToMoveDown = 100;
+	int amountToMoveDown = 60;
 	int targetYPosition = 0;
 
 	
@@ -129,22 +135,22 @@ int main(int argc, char** argv)
 	//UI
 	TextScreen* scoreText = new TextScreen();
 	SDL_Color scoreTextColour = { 0,0,200,0 };
-	scoreText->Draw(20, "../assets/Roboto.ttf", 40, 20, scoreTextColour);
+	scoreText->Draw(20, "../assets/Roboto.ttf", 40, 900, scoreTextColour);
 
-	TextScreen* roundText = new TextScreen();
-	SDL_Color roundTextColour = { 0,200,200,0 };
-	roundText->Draw(20, "../assets/Roboto.ttf", 1150, 20, roundTextColour);
+	TextScreen* playerLivesText = new TextScreen();
+	SDL_Color roundTextColour = { 0,0,200,0 };
+	playerLivesText->Draw(20, "../assets/Roboto.ttf", 1150, 900, roundTextColour);
 
 
 
 	loadSDL->Load();
 
 	startScreen->Draw("../assets/menu.png", 0, 0, 1, 1);
-	player->Draw(1, "../assets/player/Ship.png", 2, 2);
+	player->Draw(1, "../assets/player/Ship.png", 3, 3);
 
 	//Sounds initialization
-	Sound* sound = new Sound("../assets/button_hover.wav");
-
+	Sound* sound = new Sound("../assets/shoot_sound.wav");
+	Sound* explosionSound = new Sound("../assets/ship_destroy.wav");
 
 
 	//Initialize enemies
@@ -152,9 +158,26 @@ int main(int argc, char** argv)
 	{
 		for (size_t j = 0; j < columns; j++)
 		{
-			Ship* ship = new Ship();
-			ship->Draw(1, "../assets/player/Enemy_1.png", 20 + 50 * j, 40 + 50 * i, 1, 1);
-			ships.push_back(ship);
+			if (i == 0)
+			{
+				Ship* ship = new Ship();
+				ship->Draw(1, "../assets/player/Enemy_3.png", 15 + 60 * j, 40 + 60 * i, 2, 2);
+				ships.push_back(ship);
+			}
+			else if (i == 1)
+			{
+				Ship* ship = new Ship();
+				ship->Draw(1, "../assets/player/Enemy_2.png", 15 + 60 * j, 40 + 60 * i, 2, 2);
+				ships.push_back(ship);
+			}
+			else
+			{
+				Ship* ship = new Ship();
+				ship->Draw(1, "../assets/player/Enemy_1.png", 15 + 60 * j, 40 + 60 * i, 2, 2);
+				ships.push_back(ship);
+			}
+					
+
 		}
 	}
 
@@ -188,15 +211,15 @@ int main(int argc, char** argv)
 		scoreText->Render();
 
 		//Rendering and update the round text to display the players current round
-		roundText->Update("Round:  " + std::to_string(currentRound));
-		roundText->Render();
+		playerLivesText->Update("Lives:  " + std::to_string(playerLives));
+		playerLivesText->Render();
 
 		//Triggered from the player script
 		if (player->playerShoot == true)
 		{
 			player->playerShoot = false;
 			Bullet* bullet = new Bullet(0);
-			bullet->Draw("../assets/player/Bullet.png", player->GetPosPlayer().x, player->GetPosPlayer().y - 30, 2, 2);
+			bullet->Draw("../assets/player/Bullet.png", player->GetPosPlayer().x - 7, player->GetPosPlayer().y - 35, 2, 2);
 			bullets.push_back(bullet);
 
 			if (Mix_PlayChannel(-1, sound->wave(), 0, ) == -1)
@@ -237,12 +260,12 @@ int main(int argc, char** argv)
 
 			
 			//Handle enemy movement to the right
-			if (ships[0]->GetShipRect().x < 500 && movingRight && !movingDown)
+			if (ships[0]->GetShipRect().x < 400 && movingRight && !movingDown)
 			{
 				float x = ships[i]->GetShipRect().x;
 				ships[i]->Move(x += 1, ships[i]->GetShipRect().y);
 			}
-			else if (ships[0]->GetShipRect().x >= 500 && movingRight)
+			else if (ships[0]->GetShipRect().x >= 400 && movingRight)
 			{
 				movingRight = false;
 				movingDown = true;
@@ -251,12 +274,12 @@ int main(int argc, char** argv)
 
 
 			//Handle enemy movement to the left
-			if (ships[0]->GetShipRect().x > 30 && !movingRight && !movingDown)
+			if (ships[0]->GetShipRect().x > 15 && !movingRight && !movingDown)
 			{
 				float x = ships[i]->GetShipRect().x;
 				ships[i]->Move(x -= 1, ships[i]->GetShipRect().y);
 			}
-			else if (ships[0]->GetShipRect().x <= 30 && !movingRight && !movingDown)
+			else if (ships[0]->GetShipRect().x <= 15 && !movingRight && !movingDown)
 			{
 				movingRight = true;
 				movingDown = true;
@@ -284,10 +307,9 @@ int main(int argc, char** argv)
 			{
 				if (ships[i]->destroyed == false && bullets[j]->destroyed == false)
 				{
-					Collide(ships[i], bullets[j], player);
+					Collide(ships[i], bullets[j], player, explosionSound);
 					if (CheckRoundOver(ships))
 					{
-						currentRound++;
 						gameWon = true;
 						for (size_t g = 0; g < ships.size(); g++)
 						{

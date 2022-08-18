@@ -33,5 +33,5 @@ void TextScreen::LoadFont(const char* messageText)
 	m_ttfFont = TTF_OpenFont(m_fontPath.c_str(), m_fontSize);
 	textSurface = TTF_RenderText_Solid(m_ttfFont, messageText, textColour);
 	textTexture = SDL_CreateTextureFromSurface(m_Renderer, textSurface);
-	SDL_FreeSurface(textSurface);
+	//SDL_FreeSurface(textSurface);
 }
