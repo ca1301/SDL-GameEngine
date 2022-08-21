@@ -10,14 +10,17 @@
 #include <algorithm>
 
 using namespace std;
-
+//List to store the enemy bullets active in the scene
 vector <Bullet*> enemyBullets;
+//List to store the alive enemy ships
+vector <Ship*> aliveShips;
 float gameTime = 0;
 float fireRate = 0.2f;
 float lastBullet = 0;
 
 bool CheckRoundOver(vector<Ship*> ships)
 {
+	
 	int aliveEnemies = 0;
 	for (size_t i = 0; i < ships.size(); i++)
 	{
@@ -26,6 +29,7 @@ bool CheckRoundOver(vector<Ship*> ships)
 			aliveEnemies++;
 		}
 	}
+	//If the alive enemies count equals 0 then the game is over
 	if (aliveEnemies == 0)
 	{
 		return true;
@@ -54,7 +58,7 @@ void Collide(Ship* ship, Bullet* bullet, Player* player, Sound* destroySound)
 	return;
 }
 
-
+//Check if bullet hit player
 bool PlayerCollide(Bullet* bullet, Player* player)
 {
 	if ((bullet->GetBulletRect().x - player->GetPosPlayer().x < player->GetPosPlayer().w) &&
@@ -70,30 +74,32 @@ bool PlayerCollide(Bullet* bullet, Player* player)
 	}
 }
 
+//Handle enemies shooting at player
 void EnemyShoot(vector <Ship*> ships, float dt)
 {
+	//Increase the game time for timing the shots
 	gameTime += dt;
-	
-	vector <Ship*> aliveShips;
 
-	
+
+	//Reset the list of alive ships
 	aliveShips.clear();
 	for (size_t i = 0; i < ships.size(); i++)
 	{
 		if (ships[i]->destroyed == false)
 		{
+			//Add the current alive ships into list
 			aliveShips.push_back(ships[i]);
 		}
 	}
+	//check if time is greater than firerate
 	if (gameTime > fireRate + lastBullet)
 	{
 		lastBullet = gameTime + fireRate;
 		if (aliveShips.size() > 0)
 		{
-			
+			//Pick a random ship out of the alive ones to shoot
 			int randomShip = rand() % aliveShips.size();
-
-			cout << "Shoot " << randomShip << endl;
+			//Create a bullet at the random ships position
 			Bullet* bullet = new Bullet(1);
 			bullet->Draw("../assets/player/Bullet.png", aliveShips[randomShip]->GetShipRect().x, aliveShips[randomShip]->GetShipRect().y - 30, 2, 2);
 			enemyBullets.push_back(bullet);
@@ -110,7 +116,7 @@ int main(int argc, char** argv)
 	LoadSDL* loadSDL = new LoadSDL();
 	Start* startScreen = new Start();
 	int lastUpdate = 0;
-
+	GameObject* background = new GameObject();
 	//Scene management
 	int playerLives = 1;
 	vector <Bullet*> bullets;
@@ -129,7 +135,7 @@ int main(int argc, char** argv)
 
 	
 
-	//Player
+	//Initialize player with a movement speed of 5
 	Player* player = new Player(5);
 
 	//UI
@@ -144,9 +150,10 @@ int main(int argc, char** argv)
 
 
 	loadSDL->Load();
-
-	startScreen->Draw("../assets/menu.png", 0, 0, 1, 1);
+	//Configure the Start Screen, Player and Backgroud
+	startScreen->Draw("../assets/start_screen.png", 0, 0, 1, 1);
 	player->Draw(1, "../assets/player/Ship.png", 3, 3);
+	background->Draw(1, "../assets/background.png", 0, 0, 1, 1);
 
 	//Sounds initialization
 	Sound* sound = new Sound("../assets/shoot_sound.wav");
@@ -198,13 +205,14 @@ int main(int argc, char** argv)
 		//Clear the screen each frame
 		SDL_RenderClear(loadSDL->m_Renderer);
 
+		background->Render(0, SDL_RendererFlip::SDL_FLIP_NONE);
+
 		//Get delta time for player/enemy movement
 		unsigned int ticks = SDL_GetTicks() - lastUpdate;
 		float deltaTime = ticks / 1000.0f;
 		lastUpdate = SDL_GetTicks();
 
-		//Set the background color to a dark grey colour
-		SDL_SetRenderDrawColor(loadSDL->m_Renderer, 70, 70, 70, 255);
+		
 
 		//Rendering and update the score text to display the players current score
 		scoreText->Update("Score:  " + std::to_string(player->score));
@@ -319,6 +327,7 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+		//Enemy shoot at player
 		EnemyShoot(ships, deltaTime);
 
 		//Update the player based on keyboard input
@@ -329,6 +338,7 @@ int main(int argc, char** argv)
 		//Draw in window
 		SDL_RenderPresent(loadSDL->m_Renderer);
 	}
+
 	if (gameWon)
 		std::cout << "You Won!!!" << std::endl;
 
